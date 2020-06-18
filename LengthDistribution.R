@@ -8,6 +8,8 @@
 # Set a value based on the maximal population size (say, 10x of that size, to guarantee coalescence)
 # num_runs: Number of times to run the exact Markov chain (for the distribution of TMRCA in the first few generations)
 
+# bla bla
+
 calc_ell_dist = function(ell_seq,N_func,rates,q_func,max_T_coal=10000,max_T_exact_model=20,num_runs=10000)
 {
 
