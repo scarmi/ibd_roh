@@ -1,0 +1,40 @@
+#### INSTRUCTIONS FOR RUNNING####
+
+## This set of scripts implements the analysis described in Arciero et al. to examine the ROH and IBD length distribution and footprint given historical consanguinity rates and historical population size changes.
+
+LengthDistribution.flexible.R: This script implements the model described in Severson et al. [https://doi.org/10.1101/2020.06.30.180521] and in the methods of Arciero et al.
+
+run_code_to_generate_expected_IBD_and_ROH_distribution.flexible_options.R --> this calls LengthDistribution.flexible.R using parameters specified on the command line
+
+run_code_to_generate_expected_IBD_and_ROH_distribution.sh --> this is a shell script to run run_code_to_generate_expected_IBD_and_ROH_distribution.flexible_options.R with a variety of different parameters taken from the file parameters_to_run.unique.txt. (See below for how parameters_to_run.unique.txt was created.) It implements an array job within an LSF cluster queuing system. 
+
+plot_expected_versus_observed_IBD_and_ROH_footprint.R --> this makes plots using output from run_code_to_generate_expected_IBD_and_ROH_distribution.flexible_options.R as well as files from empirical_ROH_and_IBD_distributions_to_plot/ 
+
+
+
+### The following lines just illustrate bash commands to create the file parameters_to_run.unique.txt which includes the parameters that are used for the various plots in Arciero et al. ###
+
+### to look at the effect of varying kinship:
+for whichNeTrajectory in 1 2 3; do for whichpop in 1 2; do for whichRecentConsang in 1 1.1 1.5 1.55 2 2.18 2.2 2.5 3 3.1; do
+max_T_exact_model=50; oldkinship=-1; echo -ne $max_T_exact_model"\t"$oldkinship"\t"$whichRecentConsang"\t"$whichNeTrajectory"\t"$whichpop"\n" >>parameters_to_run.txt;done;done;done;
+
+### to look at the effect of varying constant Ne:
+for whichNeTrajectory in 4 6 11;do for whichpop in 1 2;do
+whichRecentConsang=1; max_T_exact_model=50; oldkinship=-1; echo -ne $max_T_exact_model"\t"$oldkinship"\t"$whichRecentConsang"\t"$whichNeTrajectory"\t"$whichpop"\n" >>parameters_to_run.txt;done;done;
+
+### to look at the effect of varying kinship for t>max_T_exact_model:
+whichNeTrajectory=1
+whichRecentConsang=2.2
+max_T_exact_model=50
+whichpop=1
+for oldkinship in 1e-4 -1 0.05; do echo -ne $max_T_exact_model"\t"$oldkinship"\t"$whichRecentConsang"\t"$whichNeTrajectory"\t"$whichpop"\n" >>parameters_to_run.txt;done;
+
+### to look at the effect of varying max_T_exact_model:
+whichNeTrajectory=1
+whichRecentConsang=1
+oldkinship=-1
+whichpop=1
+for max_T_exact_model in 10 40 50; do echo -ne $max_T_exact_model"\t"$oldkinship"\t"$whichRecentConsang"\t"$whichNeTrajectory"\t"$whichpop"\n" >>parameters_to_run.txt;done;
+
+sort parameters_to_run.txt|uniq >parameters_to_run.unique.txt
+
